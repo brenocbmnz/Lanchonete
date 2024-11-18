@@ -100,6 +100,29 @@ class OrderService(orders_pb2_grpc.OrderServiceServicer):
 
         return orders_pb2.OrderResponse(order_id=order_id, status="Cancelled")
 
+    def FinishOrder(self, request, context):
+        order_id = request.order_id
+        order = self.orders.get(order_id, None)
+
+        if not order:
+            context.set_code(grpc.StatusCode.NOT_FOUND)
+            context.set_details("Order not found")
+            print(f"[ORDER SERVICE] Tentativa de finalizar pedido {order_id}: Pedido não encontrado")
+            return orders_pb2.OrderResponse(order_id=order_id, status="Order not found")
+
+        if order["status"] == "Finished":
+            print(f"[ORDER SERVICE] Tentativa de finalizar novamente o pedido: {order_id} - Ignorado")
+            return orders_pb2.OrderResponse(order_id=order_id, status="Already finished")
+
+        if order["status"] != "Confirmed":
+            print(f"[ORDER SERVICE] Pedido {order_id} não está em estado válido para finalizar")
+            return orders_pb2.OrderResponse(order_id=order_id, status="Cannot finish order not confirmed")
+
+        # Update status to Finished
+        order["status"] = "Finished"
+        print(f"[ORDER SERVICE] Pedido {order_id} finalizado com sucesso")
+        return orders_pb2.OrderResponse(order_id=order_id, status="Finished")
+
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     orders_pb2_grpc.add_OrderServiceServicer_to_server(OrderService(), server)

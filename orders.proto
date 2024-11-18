@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-import "common.proto";
+import "common.proto";  // Certifique-se de que o arquivo `common.proto` tem a mensagem `Item`
 
 message OrderRequest {
     string customer_name = 1;
-    repeated common.Item items = 2;
+    repeated common.Item items = 2;  // Utilize o namespace correto se `Item` estiver no `common.proto`
 }
 
 message OrderResponse {
@@ -24,6 +24,7 @@ service OrderService {
     rpc GetOrder (OrderID) returns (OrderDetails);
     rpc GetAllOrders (common.Empty) returns (AllOrdersResponse);
     rpc CancelOrder (OrderID) returns (OrderResponse);
+    rpc FinishOrder (OrderID) returns (OrderResponse); // Novo método adicionado
 }
 
 message OrderID {

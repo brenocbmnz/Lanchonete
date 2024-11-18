@@ -55,6 +55,11 @@ class OrderServiceStub(object):
                 request_serializer=orders__pb2.OrderID.SerializeToString,
                 response_deserializer=orders__pb2.OrderResponse.FromString,
                 _registered_method=True)
+        self.FinishOrder = channel.unary_unary(
+                '/OrderService/FinishOrder',
+                request_serializer=orders__pb2.OrderID.SerializeToString,
+                response_deserializer=orders__pb2.OrderResponse.FromString,
+                _registered_method=True)
 
 
 class OrderServiceServicer(object):
@@ -84,6 +89,13 @@ class OrderServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def FinishOrder(self, request, context):
+        """Novo método adicionado
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_OrderServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -104,6 +116,11 @@ def add_OrderServiceServicer_to_server(servicer, server):
             ),
             'CancelOrder': grpc.unary_unary_rpc_method_handler(
                     servicer.CancelOrder,
+                    request_deserializer=orders__pb2.OrderID.FromString,
+                    response_serializer=orders__pb2.OrderResponse.SerializeToString,
+            ),
+            'FinishOrder': grpc.unary_unary_rpc_method_handler(
+                    servicer.FinishOrder,
                     request_deserializer=orders__pb2.OrderID.FromString,
                     response_serializer=orders__pb2.OrderResponse.SerializeToString,
             ),
@@ -214,6 +231,33 @@ class OrderService(object):
             request,
             target,
             '/OrderService/CancelOrder',
+            orders__pb2.OrderID.SerializeToString,
+            orders__pb2.OrderResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def FinishOrder(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/OrderService/FinishOrder',
             orders__pb2.OrderID.SerializeToString,
             orders__pb2.OrderResponse.FromString,
             options,

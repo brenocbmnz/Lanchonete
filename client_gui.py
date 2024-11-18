@@ -92,6 +92,27 @@ def cancel_order():
     except grpc.RpcError as e:
         messagebox.showerror("Erro de Conexão", f"Erro ao conectar ao servidor: {e}")
 
+# Função para finalizar um pedido
+def finish_order():
+    order_id = entry_order_id.get()
+
+    if not order_id:
+        messagebox.showerror("Erro", "O ID do pedido é obrigatório.")
+        return
+
+    # Conecta ao serviço gRPC
+    channel = grpc.insecure_channel("localhost:50051")
+    order_stub = orders_pb2_grpc.OrderServiceStub(channel)
+
+    try:
+        response = order_stub.FinishOrder(orders_pb2.OrderID(order_id=order_id))
+        if response.status == "Finished":
+            messagebox.showinfo("Pedido Finalizado", f"Pedido finalizado com sucesso! Status: {response.status}")
+        else:
+            messagebox.showwarning("Finalização de Pedido", f"Falha ao finalizar o pedido: {response.status}")
+    except grpc.RpcError as e:
+        messagebox.showerror("Erro de Conexão", f"Erro ao conectar ao servidor: {e}")
+
 # Criando a interface gráfica
 root = tk.Tk()
 root.title("Lanchonete - Pedido de Itens")
@@ -129,6 +150,10 @@ entry_order_id.grid(row=6, column=1, padx=10, pady=5)
 # Botão para cancelar pedido
 btn_cancel_order = tk.Button(root, text="Cancelar Pedido", command=cancel_order)
 btn_cancel_order.grid(row=7, column=0, columnspan=2, pady=5)
+
+# Botão para finalizar pedido
+btn_finish_order = tk.Button(root, text="Finalizar Pedido", command=finish_order)
+btn_finish_order.grid(row=8, column=0, columnspan=2, pady=5)
 
 # Inicia o loop da interface
 root.mainloop()
