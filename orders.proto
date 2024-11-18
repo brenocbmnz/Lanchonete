@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+import "common.proto";
+
+message OrderRequest {
+    string customer_name = 1;
+    repeated common.Item items = 2;
+}
+
+message OrderResponse {
+    string order_id = 1;
+    string status = 2;
+}
+
+message OrderDetails {
+    string order_id = 1;
+    string customer_name = 2;
+    repeated common.Item items = 3;
+    string status = 4;
+}
+
+service OrderService {
+    rpc CreateOrder (OrderRequest) returns (OrderResponse);
+    rpc GetOrder (OrderID) returns (OrderDetails);
+    rpc GetAllOrders (common.Empty) returns (AllOrdersResponse);
+    rpc CancelOrder (OrderID) returns (OrderResponse);
+}
+
+message OrderID {
+    string order_id = 1;
+}
+
+message AllOrdersResponse {
+    repeated OrderDetails orders = 1;
+}

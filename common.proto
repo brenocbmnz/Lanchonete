@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package common;
+
+// Definição compartilhada do Item
+message Item {
+    string item_name = 1;
+    int32 quantity = 2;
+}
+
+// Definição de mensagem vazia (Empty)
+message Empty {}

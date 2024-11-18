@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+import "common.proto";
+
+service InventoryService {
+    rpc CheckAvailability (common.Item) returns (AvailabilityResponse);
+    rpc UpdateStock (common.Item) returns (StockUpdateResponse);
+    rpc GetStock (common.Empty) returns (StockResponse);
+}
+
+message AvailabilityResponse {
+    bool available = 1;
+    string message = 2;
+}
+
+message StockUpdateResponse {
+    string status = 1;
+}
+
+message StockItem {
+    string item_name = 1;
+    int32 quantity = 2;
+}
+
+message StockResponse {
+    repeated StockItem items = 1;
+}
