@@ -2,26 +2,35 @@ syntax = "proto3";
 
 import "common.proto";
 
+// Definição do serviço InventoryService
+// Este serviço fornece métodos para gerenciar o estoque de uma lanchonete
 service InventoryService {
+    // Verifica a disponibilidade de um item no estoque
     rpc CheckAvailability (common.Item) returns (AvailabilityResponse);
+    // Atualiza o estoque adicionando ou removendo uma quantidade de um item
     rpc UpdateStock (common.Item) returns (StockUpdateResponse);
+    // Retorna o estoque atual de todos os itens
     rpc GetStock (common.Empty) returns (StockResponse);
 }
 
+// Resposta para a verificação de disponibilidade de um item
 message AvailabilityResponse {
-    bool available = 1;
-    string message = 2;
+    bool available = 1;  // Indica se o item está disponível ou não
+    string message = 2;  // Mensagem adicional sobre a disponibilidade (ex.: "Available" ou "Out of stock")
 }
 
+// Resposta para a atualização do estoque de um item
 message StockUpdateResponse {
-    string status = 1;
+    string status = 1;  // Indica o status da operação de atualização (ex.: "Updated" ou "Insufficient stock")
 }
 
+// Definição de um item no estoque
 message StockItem {
-    string item_name = 1;
-    int32 quantity = 2;
+    string item_name = 1;  // Nome do item (ex.: burger, fries, soda)
+    int32 quantity = 2;    // Quantidade disponível do item
 }
 
+// Resposta para a consulta do estoque atual
 message StockResponse {
-    repeated StockItem items = 1;
+    repeated StockItem items = 1;  // Lista de todos os itens disponíveis no estoque
 }

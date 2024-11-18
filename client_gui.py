@@ -9,24 +9,28 @@ import generated.inventory_pb2_grpc as inventory_pb2_grpc
 
 # Função para enviar pedido
 def make_order():
+    # Obtém os valores inseridos pelo usuário na interface gráfica
     customer_name = entry_customer_name.get()
     item_name = entry_item_name.get()
     quantity = entry_quantity.get()
 
+    # Verifica se todos os campos foram preenchidos
     if not customer_name or not item_name or not quantity:
         messagebox.showerror("Erro", "Todos os campos são obrigatórios.")
         return
 
+    # Tenta converter a quantidade para um número inteiro
     try:
         quantity = int(quantity)
     except ValueError:
         messagebox.showerror("Erro", "A quantidade deve ser um número inteiro.")
         return
 
-    # Conecta ao serviço gRPC
+    # Conecta ao serviço gRPC do OrderService
     channel = grpc.insecure_channel("localhost:50051")
     order_stub = orders_pb2_grpc.OrderServiceStub(channel)
 
+    # Tenta enviar o pedido usando o serviço gRPC
     try:
         response = order_stub.CreateOrder(
             orders_pb2.OrderRequest(
@@ -34,6 +38,7 @@ def make_order():
                 items=[common_pb2.Item(item_name=item_name, quantity=quantity)]
             )
         )
+        # Exibe a resposta do serviço: pedido confirmado ou não
         if response.status == "Confirmed":
             messagebox.showinfo("Pedido Confirmado", f"Pedido confirmado!\nID do pedido: {response.order_id}")
         else:
@@ -43,11 +48,14 @@ def make_order():
 
 # Função para consultar o estoque disponível
 def check_stock():
+    # Conecta ao serviço gRPC do InventoryService
     channel = grpc.insecure_channel("localhost:50052")
     inventory_stub = inventory_pb2_grpc.InventoryServiceStub(channel)
 
+    # Tenta consultar o estoque usando o serviço gRPC
     try:
         response = inventory_stub.GetStock(common_pb2.Empty())
+        # Formata a resposta do estoque para exibição
         stock_info = "\n".join([f"{item.item_name}: {item.quantity}" for item in response.items])
         messagebox.showinfo("Estoque Disponível", f"Estoque atual:\n{stock_info}")
     except grpc.RpcError as e:
@@ -55,11 +63,14 @@ def check_stock():
 
 # Função para consultar todos os pedidos
 def check_orders():
+    # Conecta ao serviço gRPC do OrderService
     channel = grpc.insecure_channel("localhost:50051")
     order_stub = orders_pb2_grpc.OrderServiceStub(channel)
 
+    # Tenta consultar todos os pedidos usando o serviço gRPC
     try:
         response = order_stub.GetAllOrders(common_pb2.Empty())
+        # Verifica se existem pedidos e formata a resposta para exibição
         if response.orders:
             orders_info = "\n\n".join([
                 f"ID do Pedido: {order.order_id}\nCliente: {order.customer_name}\nItens: {', '.join([f'{item.item_name} ({item.quantity})' for item in order.items])}\nStatus: {order.status}"
@@ -73,18 +84,22 @@ def check_orders():
 
 # Função para cancelar um pedido
 def cancel_order():
+    # Obtém o ID do pedido inserido pelo usuário
     order_id = entry_order_id.get()
 
+    # Verifica se o campo de ID do pedido foi preenchido
     if not order_id:
         messagebox.showerror("Erro", "O ID do pedido é obrigatório.")
         return
 
-    # Conecta ao serviço gRPC
+    # Conecta ao serviço gRPC do OrderService
     channel = grpc.insecure_channel("localhost:50051")
     order_stub = orders_pb2_grpc.OrderServiceStub(channel)
 
+    # Tenta cancelar o pedido usando o serviço gRPC
     try:
         response = order_stub.CancelOrder(orders_pb2.OrderID(order_id=order_id))
+        # Exibe a resposta do serviço: pedido cancelado ou não
         if response.status == "Cancelled":
             messagebox.showinfo("Cancelamento de Pedido", f"Pedido cancelado com sucesso! Status: {response.status}")
         else:
@@ -94,18 +109,22 @@ def cancel_order():
 
 # Função para finalizar um pedido
 def finish_order():
+    # Obtém o ID do pedido inserido pelo usuário
     order_id = entry_order_id.get()
 
+    # Verifica se o campo de ID do pedido foi preenchido
     if not order_id:
         messagebox.showerror("Erro", "O ID do pedido é obrigatório.")
         return
 
-    # Conecta ao serviço gRPC
+    # Conecta ao serviço gRPC do OrderService
     channel = grpc.insecure_channel("localhost:50051")
     order_stub = orders_pb2_grpc.OrderServiceStub(channel)
 
+    # Tenta finalizar o pedido usando o serviço gRPC
     try:
         response = order_stub.FinishOrder(orders_pb2.OrderID(order_id=order_id))
+        # Exibe a resposta do serviço: pedido finalizado ou não
         if response.status == "Finished":
             messagebox.showinfo("Pedido Finalizado", f"Pedido finalizado com sucesso! Status: {response.status}")
         else:

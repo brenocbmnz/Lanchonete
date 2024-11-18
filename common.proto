@@ -3,10 +3,12 @@ syntax = "proto3";
 package common;
 
 // Definição compartilhada do Item
+// Esta mensagem é utilizada para representar um item no estoque ou em um pedido
 message Item {
-    string item_name = 1;
-    int32 quantity = 2;
+    string item_name = 1;  // Nome do item (ex.: burger, fries, soda)
+    int32 quantity = 2;    // Quantidade do item (ex.: 10 unidades)
 }
 
 // Definição de mensagem vazia (Empty)
+// Esta mensagem é usada em requisições ou respostas que não precisam de nenhum dado específico
 message Empty {}

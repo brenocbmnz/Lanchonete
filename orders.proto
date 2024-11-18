@@ -2,35 +2,46 @@ syntax = "proto3";
 
 import "common.proto";  // Certifique-se de que o arquivo `common.proto` tem a mensagem `Item`
 
+// Mensagem de solicitação para criar um pedido
 message OrderRequest {
-    string customer_name = 1;
-    repeated common.Item items = 2;  // Utilize o namespace correto se `Item` estiver no `common.proto`
+    string customer_name = 1;  // Nome do cliente que está fazendo o pedido
+    repeated common.Item items = 2;  // Lista de itens do pedido, utilizando a mensagem `Item` do arquivo `common.proto`
 }
 
+// Mensagem de resposta ao criar, cancelar ou finalizar um pedido
 message OrderResponse {
-    string order_id = 1;
-    string status = 2;
+    string order_id = 1;  // ID do pedido
+    string status = 2;  // Status do pedido (e.g., "Confirmed", "Cancelled", "Failed")
 }
 
+// Mensagem para obter os detalhes de um pedido
 message OrderDetails {
-    string order_id = 1;
-    string customer_name = 2;
-    repeated common.Item items = 3;
-    string status = 4;
+    string order_id = 1;  // ID do pedido
+    string customer_name = 2;  // Nome do cliente que fez o pedido
+    repeated common.Item items = 3;  // Lista de itens do pedido
+    string status = 4;  // Status atual do pedido (e.g., "Confirmed", "Cancelled", "Finished")
 }
 
+// Definição do serviço OrderService, responsável por gerenciar os pedidos
 service OrderService {
+    // RPC para criar um pedido
     rpc CreateOrder (OrderRequest) returns (OrderResponse);
+    // RPC para obter os detalhes de um pedido específico
     rpc GetOrder (OrderID) returns (OrderDetails);
+    // RPC para obter todos os pedidos
     rpc GetAllOrders (common.Empty) returns (AllOrdersResponse);
+    // RPC para cancelar um pedido
     rpc CancelOrder (OrderID) returns (OrderResponse);
-    rpc FinishOrder (OrderID) returns (OrderResponse); // Novo método adicionado
+    // RPC para finalizar um pedido
+    rpc FinishOrder (OrderID) returns (OrderResponse);
 }
 
+// Mensagem para especificar um ID de pedido
 message OrderID {
-    string order_id = 1;
+    string order_id = 1;  // ID do pedido
 }
 
+// Mensagem que contém todos os pedidos, usada na resposta de GetAllOrders
 message AllOrdersResponse {
-    repeated OrderDetails orders = 1;
+    repeated OrderDetails orders = 1;  // Lista de detalhes dos pedidos
 }
